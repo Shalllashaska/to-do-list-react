@@ -17,7 +17,7 @@ const getStatusBackgroundColor = (status) => {
     }
 }
 
-export const ItemTemplate = memo(({ categories, ...props}) => {
+export const ItemTemplate = memo(({ categories, id, ...props}) => {
     const { onDeleteItem, onChangeItem } = useContext(MainListContext);
     const categoriesTitle = useMemo(() => {
         if (!categories?.length) {
@@ -43,14 +43,14 @@ export const ItemTemplate = memo(({ categories, ...props}) => {
                 <button
                     className="font-bold bg-red-400 hover:bg-red-100 active:bg-red-700 rounded p-1 mr-4"
                     onClick={useCallback(() => {
-                        onDeleteItem(props.id);
-                    }, [])}
+                        onDeleteItem(id);
+                    }, [onDeleteItem, id])}
                 >Удалить</button>
                 <button
                     className="font-bold bg-blue-400 hover:bg-blue-100 active:bg-blue-700 rounded p-1"
                     onClick={useCallback(() => {
-                        onChangeItem(props.id);
-                    }, [])}
+                        onChangeItem(id);
+                    }, [onChangeItem, id])}
                 >Редактировать</button>
             </div>
         </div>

@@ -112,7 +112,7 @@ export const MainList = memo((props) => {
                 }, [items])}
                 onChangeItem={useCallback((id) => {
                     console.log(`Changed item with id ${id}`);
-                }, [items])}
+                }, [])}
                 onAddItem={useCallback(() => {
                     setItems([...items, {
                         id: nextId,
@@ -121,7 +121,7 @@ export const MainList = memo((props) => {
                         status: 'successful'
                     }]);
                     setNexId(nextId + 1);
-                }, [items])}
+                }, [items, nextId])}
             />
         </div>
     );
