@@ -7,13 +7,13 @@ import {MainListContext} from "./MainListContext";
 const getStatusBackgroundColor = (status) => {
     switch (status) {
         case 'successful':
-            return 'bg-green-300';
+            return 'bg-green-300 hover:bg-green-200 active:bg-green-400';
         case 'warning':
-            return 'bg-yellow-300';
+            return 'bg-yellow-300 hover:bg-yellow-200 active:bg-yellow-400';
         case 'danger':
-            return 'bg-red-300';
+            return 'bg-red-300 hover:bg-red-200 active:bg-red-400 ';
         default:
-            return 'bg-zinc-300';
+            return 'bg-zinc-300 hover:bg-zinc-200 active:bg-zinc-400';
     }
 }
 
@@ -31,7 +31,7 @@ export const ItemTemplate = memo(({ categories, id, ...props}) => {
             'flex',
             'h-full',
             'justify-between',
-            'shadow-lg',
+            'shadow-lg transition-colors ease-linear',
             getStatusBackgroundColor(props.status)
         )}>
             <div >
@@ -41,13 +41,13 @@ export const ItemTemplate = memo(({ categories, id, ...props}) => {
             </div>
             <div>
                 <button
-                    className="font-bold bg-red-400 hover:bg-red-100 active:bg-red-700 rounded p-1 mr-4"
+                    className="font-bold bg-red-400 hover:bg-red-100 active:bg-red-700 rounded p-1 px-3 mr-4 transition-colors ease-linear"
                     onClick={useCallback(() => {
                         onDeleteItem(id);
                     }, [onDeleteItem, id])}
                 >Удалить</button>
                 <button
-                    className="font-bold bg-blue-400 hover:bg-blue-100 active:bg-blue-700 rounded p-1"
+                    className="font-bold bg-blue-400 hover:bg-blue-100 active:bg-blue-700 rounded p-1 px-3 transition-colors ease-linear"
                     onClick={useCallback(() => {
                         onChangeItem(id);
                     }, [onChangeItem, id])}
