@@ -1,3 +1,5 @@
+const fromStringToJson = (res) => res.json();
+
 export const addPost = (params) => {
     const body = JSON.stringify({
         title: params.title,
@@ -15,7 +17,7 @@ export const addPost = (params) => {
 
 export const loadPosts = (params) => {
     return fetch('./post-list')
-        .then((res) => res.json())
+        .then(fromStringToJson)
         .then((posts) => posts);
 }
 
@@ -27,4 +29,10 @@ export const deletePos = (id) => {
         },
         body: JSON.stringify({ id })
     }).then((res) => true);
+}
+
+export const readPost = (id) => {
+    return fetch(`/read-post/${id}`)
+        .then(fromStringToJson)
+        .then((post) => post);
 }

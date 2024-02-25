@@ -1,14 +1,24 @@
-import { memo, useCallback, useState } from "react";
-import { Link } from "react-router-dom";
+import { memo, useCallback, useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import * as service from "../service";
 
 import classNames from "classnames";
 
-export const Post = memo((props) => {
-    const id = props.id;
+export const Post = memo(() => {
+    const { id } = useParams();
+    const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [categories, setCategories] = useState('');
     const [content, setContent] = useState('');
+    
+    useEffect(() => {
+        if (!id) return;
+        service.readPost(id).then((post) => {
+           setTitle(post.title);
+           setContent(post.content);
+           setCategories(post.categories.join(' '));
+        });
+    }, [id])
 
     const save = useCallback(() => {
         if (!id) {
@@ -21,15 +31,16 @@ export const Post = memo((props) => {
     }, [title, content, categories, id]);
 
     const backButtonText = '<';
+    const goBack = useCallback(() => navigate(-1), []);
 
     return (
         <div className="p-3 flex flex-col bg-cyan-100 mt-6 rounded-xl shadow-lg">
-            <Link
+            <button
                 className="float-left text-3xl font-bold"
-                to="/"
+                onClick={goBack}
             >
                 {backButtonText}
-            </Link>
+            </button>
             <input
                 type="text"
                 name="title"

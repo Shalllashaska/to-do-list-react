@@ -29,6 +29,12 @@ app.post("/add-post", (req, res) => {
     post.save();
 })
 
+app.get("/read-post/:id", (req, res) => {
+    Post
+        .findById(req.params.id)
+        .then((post) => res.send(post));
+});
+
 app.get("/post-list", (req, res) => {
     Post
         .find()

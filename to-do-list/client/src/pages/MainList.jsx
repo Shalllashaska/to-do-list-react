@@ -3,21 +3,12 @@ import { ItemTemplate } from "./_mainList/ItemTemplate";
 import { MainListContext } from "./_mainList/MainListContext";
 import { AddButton } from "./_mainList/AddButton";
 import * as service from "../service";
-
-const getPosts = () => [
-    {
-        id: 1,
-        title: 'Title',
-        categories: ['1 category', '2 category'],
-        content: 'Content',
-        status: 'successful',
-    }
-];
+import { readPost } from "../service";
 
 
 const List = memo(({ items, onDeleteItem, onChangeItem, onAddItem }) => {
     if (items === undefined) {
-            throw Error('Items for list is undefined');
+        throw Error('Items for list is undefined');
     }
     return (
         <MainListContext.Provider value={{
@@ -59,21 +50,15 @@ export const MainList = memo((props) => {
         reloadList();
     }, [])
     return (
-        <div>
-            <div className="font-light text-2xl mx-auto flex w-full">Main Page</div>
-            <List
-                items={items}
-                onDeleteItem={useCallback((id) => {
-                    service.deletePos(id).then(() => reloadList());
-                }, [items])}
-                onChangeItem={useCallback((id) => {
-                    // Открываем страницу поста
-                }, [])}
-                onAddItem={useCallback(() => {
-                    // Открываем страницу поста
-                }, [items])}
-            />
-        </div>
+        <List
+            items={items}
+            onDeleteItem={useCallback((id) => {
+                service.deletePos(id).then(() => reloadList());
+            }, [items])}
+            onAddItem={useCallback(() => {
+                // Открываем страницу поста
+            }, [items])}
+        />
     );
 });
 

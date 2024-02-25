@@ -1,4 +1,5 @@
-import {memo, useCallback, useContext, useMemo} from "react";
+import { memo, useCallback, useContext, useMemo } from "react";
+import { Link } from 'react-router-dom';
 import classNames from "classnames";
 
 import './_itemTemplate.css';
@@ -28,30 +29,26 @@ export const ItemTemplate = memo(({ categories, id, ...props}) => {
     return (
         <div className={classNames(
             'itemTemplate',
-            'flex',
             'h-full',
-            'justify-between',
             'shadow-lg transition-colors ease-linear',
             getStatusBackgroundColor(props.status)
         )}>
-            <div >
+            <div>
                 <div className="font-bold text-lg">{props.title}</div>
                 <div className="font-light italic">{categoriesTitle}</div>
                 <div>{props.content}</div>
             </div>
-            <div>
+            <div className="">
                 <button
                     className="font-bold bg-red-400 hover:bg-red-100 active:bg-red-700 rounded p-1 px-3 mr-4 transition-colors ease-linear"
                     onClick={useCallback(() => {
                         onDeleteItem(id);
                     }, [onDeleteItem, id])}
                 >Удалить</button>
-                <button
+                <Link
                     className="font-bold bg-blue-400 hover:bg-blue-100 active:bg-blue-700 rounded p-1 px-3 transition-colors ease-linear"
-                    onClick={useCallback(() => {
-                        onChangeItem(id);
-                    }, [onChangeItem, id])}
-                >Редактировать</button>
+                    to={`post/${id}`}
+                >Редактировать</Link>
             </div>
         </div>
     );
