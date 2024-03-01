@@ -30,6 +30,7 @@ const List = memo(({ items, ...props }) => {
         <div>
             {items.map((item) => (
                 <ItemTemplate
+                    key={item._id}
                     title={item.title}
                 />
             ))}

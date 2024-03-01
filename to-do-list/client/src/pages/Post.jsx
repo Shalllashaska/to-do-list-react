@@ -1,37 +1,47 @@
-import { memo, useCallback, useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { memo, useCallback, useState } from "react";
+import { useNavigate, useLoaderData } from "react-router-dom";
+import Picker from 'emoji-picker-react';
 import * as service from "../service";
 
 import classNames from "classnames";
 
 export const Post = memo(() => {
-    const { id } = useParams();
+
+    const prefetchRecord = useLoaderData();
+    const id = prefetchRecord?._id;
     const navigate = useNavigate();
-    const [title, setTitle] = useState('');
-    const [categories, setCategories] = useState('');
-    const [content, setContent] = useState('');
-    
-    useEffect(() => {
-        if (!id) return;
-        service.readPost(id).then((post) => {
-           setTitle(post.title);
-           setContent(post.content);
-           setCategories(post.categories.join(' '));
-        });
-    }, [id])
+    const [title, setTitle] = useState(prefetchRecord?.title || '');
+    const [categories, setCategories] = useState(prefetchRecord?.categories.join(' ') || '');
+    const [content, setContent] = useState(prefetchRecord?.content || '');
+
+    const goBack = useCallback(() => navigate(-1), []);
 
     const save = useCallback(() => {
+        let promise;
         if (!id) {
-            service.addPost({
+            promise = service.addPost({
+                title,
+                content,
+                categories
+            });
+        } else {
+            promise = service.updatePost({
+                id,
                 title,
                 content,
                 categories
             });
         }
-    }, [title, content, categories, id]);
+        promise.then(() => {
+            goBack();
+        });
+    }, [title, content, categories, id, goBack]);
+
+    const onEmojiClick = useCallback((emojiObject) => {
+        setContent((prevContent) => prevContent + emojiObject.emoji);
+    });
 
     const backButtonText = '<';
-    const goBack = useCallback(() => navigate(-1), []);
 
     return (
         <div className="p-3 flex flex-col bg-cyan-100 mt-6 rounded-xl shadow-lg">
@@ -79,6 +89,7 @@ export const Post = memo(() => {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
             />
+            <Picker className="mt-6" pickerStyle={{ width: "100%" }} onEmojiClick={onEmojiClick} />
             <button
                 className={classNames("mt-8 text-lg drop-shadow-md",
                     "font-bold w-full",
@@ -93,3 +104,7 @@ export const Post = memo(() => {
 });
 
 Post.displayName = 'Post';
+
+export const postLoader = async ({ request, params }) => {
+    return await service.readPost(params.id);
+}

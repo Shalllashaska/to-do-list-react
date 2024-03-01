@@ -20,13 +20,18 @@ app.use(express.json());
 app.post("/add-post", (req, res) => {
     const { title, content, categories: categoriesReq } = req.body;
     const categories = categoriesReq.split(' ');
-    console.log(categories);
     const post = new Post({
         title,
         content,
         categories
     });
-    post.save();
+    post.save().then(() => res.send(true));
+})
+
+app.post("/update-post", (req, res) => {
+    const { id, title, content, categories: categoriesReq } = req.body;
+    const categories = categoriesReq.split(' ');
+    Post.findByIdAndUpdate(id, { title, content, categories }).then(() => res.send(true));
 })
 
 app.get("/read-post/:id", (req, res) => {

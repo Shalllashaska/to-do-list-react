@@ -3,7 +3,7 @@ import { ItemTemplate } from "./_mainList/ItemTemplate";
 import { MainListContext } from "./_mainList/MainListContext";
 import { AddButton } from "./_mainList/AddButton";
 import * as service from "../service";
-import { readPost } from "../service";
+import { useLoaderData } from "react-router-dom";
 
 
 const List = memo(({ items, onDeleteItem, onChangeItem, onAddItem }) => {
@@ -42,7 +42,8 @@ const List = memo(({ items, onDeleteItem, onChangeItem, onAddItem }) => {
 });
 
 export const MainList = memo((props) => {
-    const [items, setItems] = useState([]);
+    const posts = useLoaderData();
+    const [items, setItems] = useState(posts);
 
     const reloadList = useCallback(() => service.loadPosts().then((posts) => setItems(posts)), []);
 
@@ -53,7 +54,7 @@ export const MainList = memo((props) => {
         <List
             items={items}
             onDeleteItem={useCallback((id) => {
-                service.deletePos(id).then(() => reloadList());
+                service.deletePost(id).then(() => reloadList());
             }, [items])}
             onAddItem={useCallback(() => {
                 // Открываем страницу поста
@@ -63,3 +64,5 @@ export const MainList = memo((props) => {
 });
 
 MainList.displayName = 'MainList';
+
+export const mainListLoader = async ({ request, params }) => await service.loadPosts();
