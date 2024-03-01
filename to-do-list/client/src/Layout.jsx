@@ -16,10 +16,6 @@ export const Layout = memo(() => {
                         className={linkClassName}
                         to="/"
                     >Главная страница</NavLink>
-                    <NavLink
-                        className={linkClassName}
-                        to="/categories"
-                    >Категории</NavLink>
                 </div>
             </header>
             <Outlet />

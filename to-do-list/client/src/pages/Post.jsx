@@ -1,17 +1,18 @@
 import { memo, useCallback, useState } from "react";
-import { useNavigate, useLoaderData } from "react-router-dom";
+import { useNavigate, useLoaderData, useParams } from "react-router-dom";
 import Picker from 'emoji-picker-react';
 import * as service from "../service";
 
 import classNames from "classnames";
 
 export const Post = memo(() => {
-
+    const params = useParams();
+    const readOnly = params.readOnly === 'true';
     const prefetchRecord = useLoaderData();
     const id = prefetchRecord?._id;
     const navigate = useNavigate();
     const [title, setTitle] = useState(prefetchRecord?.title || '');
-    const [categories, setCategories] = useState(prefetchRecord?.categories.join(' ') || '');
+    const [categories, setCategories] = useState(prefetchRecord?.categories || '');
     const [content, setContent] = useState(prefetchRecord?.content || '');
 
     const goBack = useCallback(() => navigate(-1), []);
@@ -32,73 +33,105 @@ export const Post = memo(() => {
                 categories
             });
         }
-        promise.then(() => {
-            goBack();
-        });
+        promise
+            .then(() => goBack())
+            .catch((error) => console.log(error));
     }, [title, content, categories, id, goBack]);
 
     const onEmojiClick = useCallback((emojiObject) => {
         setContent((prevContent) => prevContent + emojiObject.emoji);
     });
-
-    const backButtonText = '<';
+    
+    const onTitleChange = useCallback((e) => setTitle(e.target.value), []);
+    const onCategoriesChange = useCallback((e) => setCategories(e.target.value), []);
+    const onContentChange = useCallback((e) => setContent(e.target.value), []);
 
     return (
-        <div className="p-3 flex flex-col bg-cyan-100 mt-6 rounded-xl shadow-lg">
-            <button
-                className="float-left text-3xl font-bold"
-                onClick={goBack}
-            >
-                {backButtonText}
-            </button>
-            <input
-                type="text"
-                name="title"
-                className={classNames(
-                    "block drop-shadow-md mt-6 w-full rounded-md",
-                    "border-0 py-1.5 pl-7 pr-20 text-gray-900",
-                    "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
-                    "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
-                    "sm:text-sm sm:leading-6")}
-                placeholder="Название поста"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-            />
-            <input
-                type="text"
-                name="categories"
-                className={classNames(
-                    "block mt-6 drop-shadow-md w-full rounded-md",
-                    "border-0 py-1.5 pl-7 pr-20 text-gray-900",
-                    "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
-                    "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
-                    "sm:text-sm sm:leading-6")}
-                placeholder="Категории"
-                value={categories}
-                onChange={(e) => setCategories(e.target.value)}
-            />
-            <textarea
-                name="content"
-                className={classNames(
-                    "block mt-6 drop-shadow-md w-full rounded-md",
-                    "border-0 py-1.5 pl-7 pr-20 text-gray-900",
-                    "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
-                    "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
-                    "sm:text-sm sm:leading-6")}
-                placeholder="Введите текст..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-            />
-            <Picker className="mt-6" pickerStyle={{ width: "100%" }} onEmojiClick={onEmojiClick} />
-            <button
-                className={classNames("mt-8 text-lg drop-shadow-md",
-                    "font-bold w-full",
-                    "bg-amber-200 hover:bg-amber-100 active:bg-green-600",
-                    "rounded hover:rounded-2xl",
-                    "ease-linear transition-all")}
-                type="submit"
-                onClick={save}
-            >Сохранить</button>
+        <div className="p-3 border-8 border-gray-200 flex-col mt-6 rounded-xl shadow-lg">
+            <div className="flex items-baseline justify-between">
+                <button
+                    className="text-lg text-white bg-blue-500 hover:bg-blue-400 active:bg-blue-700 rounded-lg p-3 mb-8"
+                    onClick={goBack}
+                >
+                    Вернуться к списку постов
+                </button>
+                {!readOnly && (
+                    <button
+                        className={classNames("p-3 text-lg drop-shadow-md",
+                            "font-bold",
+                            "bg-green-400 hover:bg-green-100 active:bg-green-600",
+                            "rounded-lg",
+                            "ease-linear transition-all")}
+                        type="submit"
+                        onClick={save}
+                    >Сохранить</button>
+                )}
+            </div>
+            {!readOnly
+                ? (
+                    <input
+                        type="text"
+                        name="title"
+                        className={classNames(
+                            "block drop-shadow-md mt-6 w-full rounded-md",
+                            "border-0 py-1.5 pl-7 pr-20 text-gray-900",
+                            "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
+                            "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
+                            "sm:text-sm sm:leading-6")}
+                        placeholder="Название поста"
+                        value={title}
+                        onChange={onTitleChange}
+                    />
+                )
+                : (
+                    <div className="font-bold text-3xl mb-2">{title}</div>
+                )
+            }
+            {!readOnly
+                ? (
+                    <input
+                        type="text"
+                        name="categories"
+                        className={classNames(
+                            "block mt-6 drop-shadow-md w-full rounded-md",
+                            "border-0 py-1.5 pl-7 pr-20 text-gray-900",
+                            "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
+                            "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
+                            "sm:text-sm sm:leading-6")}
+                        placeholder="Категории"
+                        value={categories}
+                        onChange={onCategoriesChange}
+                    />
+                )
+                : (
+                    <div className="italic text-2xl mb-2">
+                        <span className="not-italic mr-2">Категории:</span>
+                        {categories}
+                    </div>
+                )
+            }
+            {!readOnly
+                ? (
+                    <textarea
+                        name="content"
+                        className={classNames(
+                            "block mt-6 drop-shadow-md w-full rounded-md",
+                            "border-0 py-1.5 pl-7 pr-20 text-gray-900",
+                            "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
+                            "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
+                            "sm:text-sm sm:leading-6")}
+                        placeholder="Введите текст..."
+                        value={content}
+                        onChange={onContentChange}
+                    />
+                )
+                : (
+                    <div className="text-2xl mb-2">
+                        {content}
+                    </div>
+                )
+            }
+            {!readOnly && (<Picker className="mt-6" pickerStyle={{ width: "100%" }} onEmojiClick={onEmojiClick} />)}
         </div>
     );
 });

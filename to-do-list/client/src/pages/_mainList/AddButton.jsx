@@ -3,18 +3,20 @@ import { Link } from 'react-router-dom';
 import * as classNames from "classnames";
 import { MainListContext } from "./MainListContext";
 
-export const AddButton = memo(({ className }) => {
-    const { onAddItem } = useContext(MainListContext);
+export const AddButton = memo(({ className, ...props }) => {
+    const context = useContext(MainListContext);
     return (
         <Link
             className={classNames(
-                'text-blue-400 ml-3',
-                'hover: text-blue-200',
-                'active: text-blue-700',
-                className
+                'text-white ml-3',
+                'bg-blue-500',
+                'p-2',
+                'rounded-md',
+                'hover:bg-blue-400',
+                'active:bg-blue-700'
             )}
             to="/add-post"
-            onClick={onAddItem}
+            onClick={context?.onAddItem || props.onAddItem}
         >Добавить пост</Link>
     )
 });

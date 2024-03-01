@@ -1,7 +1,12 @@
 const fromStringToJson = (res) => res.json();
 
 export const loadPosts = (params) => {
-    return fetch('./post-list')
+    if (!params?.searchString || !params?.searchType) {
+        return fetch(`./post-list`)
+            .then(fromStringToJson)
+            .then((posts) => posts);
+    }
+    return fetch(`./post-list/${params.searchString}/${params.searchType}`)
         .then(fromStringToJson)
         .then((posts) => posts);
 }

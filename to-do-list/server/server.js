@@ -17,38 +17,60 @@ const PORT = 5000;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.post("/add-post", (req, res) => {
-    const { title, content, categories: categoriesReq } = req.body;
-    const categories = categoriesReq.split(' ');
+app.post("/add-post", (req, res, next) => {
+    const { title, content, categories } = req.body;
+    //const categories = categoriesReq.split(' ');
     const post = new Post({
         title,
         content,
         categories
     });
-    post.save().then(() => res.send(true));
+    post.save()
+        .then(() => res.send(post))
+        .catch((error) => next(error));
 })
 
-app.post("/update-post", (req, res) => {
-    const { id, title, content, categories: categoriesReq } = req.body;
-    const categories = categoriesReq.split(' ');
-    Post.findByIdAndUpdate(id, { title, content, categories }).then(() => res.send(true));
+app.post("/update-post", (req, res, next) => {
+    const { id, title, content, categories } = req.body;
+    Post.findByIdAndUpdate(id, { title, content, categories })
+        .then((post) => res.send(post))
+        .catch((error) => next(error));
 })
 
-app.get("/read-post/:id", (req, res) => {
+app.get("/read-post/:id", (req, res, next) => {
     Post
         .findById(req.params.id)
-        .then((post) => res.send(post));
+        .then((post) => res.send(post))
+        .catch((error) => next(error));
 });
 
-app.get("/post-list", (req, res) => {
+app.get("/post-list/:searchString?/:searchType?", (req, res, next) => {
+    const searchString = req.params?.searchString;
+    const searchType = req.params?.searchType;
+    const filter = !searchType || !searchString
+        ? undefined
+        : {
+            '$or': [
+                { [searchType]: {'$regex': searchString, '$options': 'i'}}
+            ]
+        };
+    if (!filter) {
+        return Post
+            .find()
+            .then((posts) => res.send(posts))
+            .catch((error) => next(error));
+    }
     Post
-        .find()
-        .then((posts) => res.send(posts));
+        .find(filter)
+        .then((posts) => res.send(posts))
+        .catch((error) => next(error));
 });
 
-app.post("/post-delete", (req, res) => {
-    const { id: _id } = req.body;
-    Post.deleteOne({ _id }).then(() => res.send(true));
+app.post("/post-delete", (req, res, next) => {
+    const { id } = req.body;
+    Post.findByIdAndDelete(id)
+        .then((post) => res.send(post))
+        .catch((error) => next(error));
 });
 
 app.listen(PORT, () => {
