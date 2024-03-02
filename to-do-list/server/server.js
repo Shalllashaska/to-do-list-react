@@ -27,21 +27,21 @@ app.post("/add-post", (req, res, next) => {
     });
     post.save()
         .then(() => res.send(post))
-        .catch((error) => next(error));
+        .catch((error) => res.send(error));
 })
 
 app.post("/update-post", (req, res, next) => {
     const { id, title, content, categories } = req.body;
     Post.findByIdAndUpdate(id, { title, content, categories })
         .then((post) => res.send(post))
-        .catch((error) => next(error));
+        .catch((error) => res.send(error));
 })
 
 app.get("/read-post/:id", (req, res, next) => {
     Post
         .findById(req.params.id)
         .then((post) => res.send(post))
-        .catch((error) => next(error));
+        .catch((error) => res.send(error));
 });
 
 app.get("/post-list/:searchString?/:searchType?", (req, res, next) => {
@@ -58,19 +58,19 @@ app.get("/post-list/:searchString?/:searchType?", (req, res, next) => {
         return Post
             .find()
             .then((posts) => res.send(posts))
-            .catch((error) => next(error));
+            .catch((error) => res.send(error));
     }
     Post
         .find(filter)
         .then((posts) => res.send(posts))
-        .catch((error) => next(error));
+        .catch((error) => res.send(error));
 });
 
 app.post("/post-delete", (req, res, next) => {
     const { id } = req.body;
     Post.findByIdAndDelete(id)
         .then((post) => res.send(post))
-        .catch((error) => next(error));
+        .catch((error) => res.send(error));
 });
 
 app.listen(PORT, () => {

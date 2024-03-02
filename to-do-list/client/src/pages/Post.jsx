@@ -5,6 +5,39 @@ import * as service from "../service";
 
 import classNames from "classnames";
 
+const CategoriesBlock = memo(({ categories }) => {
+    if (!categories.length) {
+        return (
+            <div className="italic text-2xl mb-2">
+                Без категорий
+            </div>
+        )
+    }
+    return (
+        <div className="italic text-2xl mb-2">
+            <span className="not-italic mr-2">Категории:</span>
+            {categories}
+        </div>
+    )
+});
+
+const Validator = memo(({ children, valid = true, inValidStatus, className }) => {
+    return (
+        <div className={className}>
+            {!valid && (
+                <div className="mb-1 text-red-500">
+                    {inValidStatus}
+                </div>
+            )}
+            <div className={classNames(
+                !valid && 'border-2 rounded-md border-red-400'
+            )}>
+                {children}
+            </div>
+        </div>
+    );
+});
+
 export const Post = memo(() => {
     const params = useParams();
     const readOnly = params.readOnly === 'true';
@@ -14,10 +47,19 @@ export const Post = memo(() => {
     const [title, setTitle] = useState(prefetchRecord?.title || '');
     const [categories, setCategories] = useState(prefetchRecord?.categories || '');
     const [content, setContent] = useState(prefetchRecord?.content || '');
+    const [titleValid, setTitleValid] = useState(true);
+    const [contentValid, setContentValid] = useState(true);
 
     const goBack = useCallback(() => navigate(-1), []);
 
     const save = useCallback(() => {
+        const titleIsValid = title.length > 0;
+        const contentIsValid = content.length > 0;
+        setTitleValid(titleIsValid);
+        setContentValid(contentIsValid);
+        if (!titleIsValid || !contentIsValid) {
+            return;
+        }
         let promise;
         if (!id) {
             promise = service.addPost({
@@ -69,19 +111,25 @@ export const Post = memo(() => {
             </div>
             {!readOnly
                 ? (
-                    <input
-                        type="text"
-                        name="title"
-                        className={classNames(
-                            "block drop-shadow-md mt-6 w-full rounded-md",
-                            "border-0 py-1.5 pl-7 pr-20 text-gray-900",
-                            "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
-                            "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
-                            "sm:text-sm sm:leading-6")}
-                        placeholder="Название поста"
-                        value={title}
-                        onChange={onTitleChange}
-                    />
+                    <Validator
+                        className="mt-6"
+                        valid={titleValid}
+                        inValidStatus="Введите какое-нибудь название"
+                    >
+                        <input
+                            type="text"
+                            name="title"
+                            className={classNames(
+                                "block drop-shadow-md w-full rounded-md",
+                                "border-0 py-1.5 pl-7 pr-20 text-gray-900",
+                                "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
+                                "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
+                                "sm:text-sm sm:leading-6")}
+                            placeholder="Название поста"
+                            value={title}
+                            onChange={onTitleChange}
+                        />
+                    </Validator>
                 )
                 : (
                     <div className="font-bold text-3xl mb-2">{title}</div>
@@ -104,26 +152,29 @@ export const Post = memo(() => {
                     />
                 )
                 : (
-                    <div className="italic text-2xl mb-2">
-                        <span className="not-italic mr-2">Категории:</span>
-                        {categories}
-                    </div>
+                   <CategoriesBlock categories={categories}/>
                 )
             }
             {!readOnly
                 ? (
-                    <textarea
-                        name="content"
-                        className={classNames(
-                            "block mt-6 drop-shadow-md w-full rounded-md",
-                            "border-0 py-1.5 pl-7 pr-20 text-gray-900",
-                            "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
-                            "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
-                            "sm:text-sm sm:leading-6")}
-                        placeholder="Введите текст..."
-                        value={content}
-                        onChange={onContentChange}
-                    />
+                    <Validator
+                        className="mt-6"
+                        valid={contentValid}
+                        inValidStatus="Введите какой-нибудь текст"
+                    >
+                        <textarea
+                            name="content"
+                            className={classNames(
+                                "block drop-shadow-md w-full rounded-md",
+                                "border-0 py-1.5 pl-7 pr-20 text-gray-900",
+                                "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
+                                "focus:ring-2 focus:ring-inset focus:ring-indigo-600",
+                                "sm:text-sm sm:leading-6")}
+                            placeholder="Введите текст..."
+                            value={content}
+                            onChange={onContentChange}
+                        />
+                    </Validator>
                 )
                 : (
                     <div className="text-2xl mb-2">

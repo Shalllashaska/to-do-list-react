@@ -16,7 +16,7 @@ const Search = memo(({ className, onSearch }) => {
                 onChange={useCallback((e) => setSearchString(e.target.value), [])}
                 className={classNames(
                     'w-52',
-                    "truncate block drop-shadow-md mt-6 w-full rounded-md",
+                    "truncate block drop-shadow-md mt-6 rounded-md",
                     "border-0 py-1.5 pl-2 pr-2 text-gray-900",
                     "ring-1 ring-inset ring-gray-300 placeholder:text-gray-400",
                     "focus:ring-2 focus:ring-inset focus:ring-indigo-600",

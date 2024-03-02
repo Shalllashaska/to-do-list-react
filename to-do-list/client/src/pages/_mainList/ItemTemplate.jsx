@@ -5,27 +5,8 @@ import classNames from "classnames";
 import './_itemTemplate.css';
 import {MainListContext} from "./MainListContext";
 
-const getStatusBackgroundColor = (status) => {
-    switch (status) {
-        case 'successful':
-            return 'bg-green-300 hover:bg-green-200 active:bg-green-400';
-        case 'warning':
-            return 'bg-yellow-300 hover:bg-yellow-200 active:bg-yellow-400';
-        case 'danger':
-            return 'bg-red-300 hover:bg-red-200 active:bg-red-400 ';
-        default:
-            return 'bg-zinc-300 hover:bg-zinc-200 active:bg-zinc-400';
-    }
-}
-
 export const ItemTemplate = memo(({ categories, id, ...props}) => {
-    const { onDeleteItem, onChangeItem } = useContext(MainListContext);
-    const categoriesTitle = useMemo(() => {
-        if (!categories?.length) {
-                return 'No categories'
-        }
-        return categories;
-    }, [categories]);
+    const { onDeleteItem } = useContext(MainListContext);
     return (
         <div className={classNames(
             'mb-2',
@@ -42,12 +23,19 @@ export const ItemTemplate = memo(({ categories, id, ...props}) => {
                     className="font-bold text-lg hover:text-gray-500 transition-colors ease-linear"
                     to={`post/${id}/true`}
                 >{props.title}</Link>
-                {categoriesTitle.length > 0 && (
+                {categories.length > 0
+                    ? (
                     <div className="font-light italic">
                         <span className="not-italic mr-1">Категории:</span>
-                        {categoriesTitle}
+                        {categories}
                     </div>
-                )}
+                    )
+                    : (
+                        <div className="font-light italic">
+                            Без категорий
+                        </div>
+                    )
+                }
                 <div>{props.content}</div>
             </div>
             <div className="shrink-0">

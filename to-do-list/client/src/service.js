@@ -1,14 +1,17 @@
 const fromStringToJson = (res) => res.json();
 
-export const loadPosts = (params) => {
-    if (!params?.searchString || !params?.searchType) {
-        return fetch(`./post-list`)
-            .then(fromStringToJson)
-            .then((posts) => posts);
+const throwError = (res) => {
+    if (!res.errors) {
+        return res;
     }
-    return fetch(`./post-list/${params.searchString}/${params.searchType}`)
+    throw new Error(res.message);
+};
+
+export const loadPosts = (params) => {
+    const fetchString = `./post-list${params?.searchString ? '/' + params.searchString : ''}${params?.searchType ? '/' + params.searchType : ''}`;
+    return fetch(fetchString)
+        .then(throwError)
         .then(fromStringToJson)
-        .then((posts) => posts);
 }
 
 export const addPost = (params) => {
@@ -22,7 +25,9 @@ export const addPost = (params) => {
             content:  params.content,
             categories:  params.categories
         })
-    });
+    })
+        .then(fromStringToJson)
+        .then(throwError);
 }
 
 export const updatePost = (record) => {
@@ -33,6 +38,8 @@ export const updatePost = (record) => {
         },
         body: JSON.stringify(record)
     })
+        .then(fromStringToJson)
+        .then(throwError);
 }
 
 export const deletePost = (id) => {
@@ -42,11 +49,13 @@ export const deletePost = (id) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ id })
-    }).then((res) => true);
+    })
+        .then(fromStringToJson)
+        .then(throwError);
 }
 
 export const readPost = (id) => {
     return fetch(`/read-post/${id}`)
         .then(fromStringToJson)
-        .then((post) => post);
+        .then(throwError);
 }
