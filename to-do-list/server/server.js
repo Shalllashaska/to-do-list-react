@@ -1,18 +1,19 @@
 const express = require('express');
+require('dotenv').config();
 const mongoose = require('mongoose');
+const chalk = require('chalk');
 const mongooseDelete = require('mongoose-delete');
 const Post = require('./models/post');
 
-const dbAccess = 'mongodb+srv://polinaPavlova:BeoO5p0ItBHL7MJS@cluster0.b2ih9xt.mongodb.net/node-to-do-list?retryWrites=true&w=majority&appName=Cluster0';
+const errorMsg = chalk.bgKeyword('white').redBright;
+const successMsg = chalk.bgKeyword('green').white;
 
 mongoose
-    .connect(dbAccess)
-    .then(() => console.log('Database connected'))
-    .catch((error) => console.log(error));
+    .connect(process.env.MONGO_URL)
+    .then(() => console.log(successMsg('Database connected')))
+    .catch((error) => console.log(errorMsg(error)));
 
 const app = express();
-
-const PORT = 5000;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -73,6 +74,6 @@ app.post("/post-delete", (req, res, next) => {
         .catch((error) => res.send(error));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
+app.listen(process.env.PORT, (error) => {
+    error ? console.log(errorMsg(error)) : console.log(successMsg(`Server started on port ${process.env.PORT}`));
 });
